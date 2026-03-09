@@ -4,6 +4,6 @@ class Zone:
         self.name = name
         self.x = x
         self.y = y
-        self.type = type
-        self.color = color
-        self.max_drones = max_drone
+
+    def get_name(self) -> str:
+        return self.name
