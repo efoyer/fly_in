@@ -9,6 +9,13 @@ class Meta_Type(Enum):
     MAX_DRONES = "max_drones"
 
 
+class Zone_Type(Enum):
+    RESTRICTED = "restricted"
+    NORMAL = "normal"
+    PRIORITY = "priority"
+    BLOCKED = "blocked"
+
+
 class Parser:
     b_start = False
     b_end = False
@@ -23,7 +30,7 @@ class Parser:
                     if not line or line.startswith('#'):
                         continue
                     key, value = map(str.strip, line.split(":", 1))
-                    Parser.type_load(key, value)
+
 
         except PermissionError as e:
             print(f"Permission Error: {e}")
@@ -31,18 +38,31 @@ class Parser:
             print(f"File Not Found: {e}")
         except Exception as e:
             print(f"Error: {e}")
+        
+
+    def parse_nb_drones(line: str):
+        try:
+            line.strip()
+            value = int(line)
+            return value
+        except Exception as e:
+            print(e)
+
+
+    def parse_connection(line):
+        pass
+
 
     def parse_hub(line):
-        if not Parser.b_start:
-            try:
-                name, x, y, meta = line.split(" ")
-                x = int(x)
-                y = int(y)
-                dict_meta: dict = Parser.parse_meta(meta)
+        try:
+            name, x, y, meta = line.split(" ")
+            x = int(x)
+            y = int(y)
+            dict_meta: dict = Parser.parse_meta(meta)
+            return Zone(name, x, y, dict_meta)
+        except ValueError as e:
+            print(e)
 
-
-            except ValueError as e:
-                print(e)
 
     def parse_meta(meta: str) -> dict:
         res = {}
@@ -55,7 +75,36 @@ class Parser:
             if key in (e.value for e in Meta_Type):
                 if key == "color":
                     color = value
-                if 
+                    res.update({
+                        "color": color
+                    })
+                elif key == "zone":
+                    if value in (e.value for e in Zone_Type):
+                        zone = value
+                        res.update({
+                            "zone": zone
+                        })
+                    else:
+                        raise ValueError(f"{value} isn't a zone type")
+                elif key == "max_drones":
+                    try:
+                        max_drones = int(value)
+                        if max_drones < 0:
+                            raise ValueError(
+                                "Max drones can't be a negative value")
+                        else:
+                            res.update({
+                                "max_drones": max_drones
+                            })
+                    except ValueError as e:
+                        print(e)
+                else:
+                    raise ValueError(f"{key} isn't a valid key")
+            else:
+                raise ValueError(f"{key} isn't a valid key")
+            return res
+
+                
 
     
 

@@ -1,7 +1,6 @@
 class Zone:
     def __init__(self, name: str, x: int, y: int,
-                 type: str = None, color: str = None,
-                 max_drone: int = 1):
+                 meta: dict):
         self.name = name
         self.x = x
         self.y = y
