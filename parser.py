@@ -1,5 +1,12 @@
 from .zone import Zone
 from .graph import Graph
+from enum import Enum
+
+
+class Meta_Type(Enum):
+    ZONE =  "zone"
+    COLOR = "color"
+    MAX_DRONES = "max_drones"
 
 
 class Parser:
@@ -24,6 +31,36 @@ class Parser:
             print(f"File Not Found: {e}")
         except Exception as e:
             print(f"Error: {e}")
+
+    def parse_hub(line):
+        if not Parser.b_start:
+            try:
+                name, x, y, meta = line.split(" ")
+                x = int(x)
+                y = int(y)
+                dict_meta: dict = Parser.parse_meta(meta)
+
+
+            except ValueError as e:
+                print(e)
+
+    def parse_meta(meta: str) -> dict:
+        res = {}
+        if not (meta.startswith("[") and meta.endswith("]")):
+            return res  
+        meta = meta.replace("[", "").replace("]", "")
+        
+        for data in meta.split(" "):
+            key, value = data.split("=")
+            if key in (e.value for e in Meta_Type):
+                if key == "color":
+                    color = value
+                if 
+
+    
+
+
+
 
     @staticmethod
     def type_load(key: str, value: str) -> any:
