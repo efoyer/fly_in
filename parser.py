@@ -58,6 +58,7 @@ class Parser:
                         Parser.lst_con.append(connection)
                     else:
                         continue
+                Parser.check_var(start, end, nb_drones)
                 return Graph(nb_drones=nb_drones,
                              start=start,
                              end=end,
@@ -186,3 +187,11 @@ class Parser:
             if hub.get_name() == name:
                 return hub
         raise ValueError("No Hub found ! (name_to_hub function)")
+    
+    def check_var(start: any, end: any, nb_drones: any):
+        if not start:
+            raise ValueError("start_hub does not exist")
+        if not end:
+            raise ValueError("end_hub does not exist")
+        if not nb_drones:
+            raise ValueError("nb_drones does not exist")
