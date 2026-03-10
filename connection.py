@@ -1,4 +1,4 @@
-from .zone import Zone
+from .hub import Zone
 
 
 class Connection:

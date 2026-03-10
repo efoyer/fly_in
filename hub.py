@@ -1,4 +1,4 @@
-class Zone:
+class Hub:
     def __init__(self, name: str, x: int, y: int,
                  meta: dict):
         self.name = name
