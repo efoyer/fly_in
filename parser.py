@@ -35,6 +35,7 @@ class Parser:
     def load(path: str) -> Graph:
         try:
             Parser.hubs = []
+            Parser.lst_con = []
             with open(path, "r") as f:
                 i: int = 0
                 for line in f:
@@ -118,8 +119,12 @@ class Parser:
                 meta = None
             x = int(x)
             y = int(y)
+            if name in (h.get_name() for h in Parser.hubs):
+                raise ValueError(f"Line {n_line}: {name} already exists")
+            if "-" in name:
+                raise ValueError(f"Line {n_line}: '-' not allowed in the name")
             if meta:
-                dict_meta: dict = Parser.parse_meta(meta)
+                dict_meta: dict = Parser.parse_meta(meta, n_line)
                 return Hub(name, x, y, dict_meta)
             return Hub(name, x, y)
         except ValueError as e:
@@ -127,8 +132,6 @@ class Parser:
 
     def parse_meta(meta: str, n_line: int) -> dict:
         res = {}
-        if not (meta.startswith("[") and meta.endswith("]")):
-            return res
         meta = meta.replace("[", "").replace("]", "")
 
         for data in meta.split(" "):
