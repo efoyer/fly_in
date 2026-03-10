@@ -1,7 +1,7 @@
-from .hub import Zone
+from .hub import Hub
 
 
 class Connection:
-    def __init__(self,  start: Zone, end: Zone):
+    def __init__(self,  start: Hub, end: Hub):
         self.start = start
         self.end = end

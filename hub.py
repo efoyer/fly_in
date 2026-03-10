@@ -1,6 +1,6 @@
 class Hub:
     def __init__(self, name: str, x: int, y: int,
-                 meta: dict):
+                 meta: dict = None):
         self.name = name
         self.x = x
         self.y = y

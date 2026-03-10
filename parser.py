@@ -33,6 +33,7 @@ class Parser:
     @staticmethod
     def load(path: str) -> Graph:
         try:
+            Parser.hubs = []
             with open(path, "r") as f:
                 lst_con: list[Connection] = []
                 for line in f:
@@ -70,13 +71,16 @@ class Parser:
         try:
             line.strip()
             value: int = int(line)
-            return value
+            if value >= 0:
+                return value
+            else:
+                raise ValueError(f"nb_drones cannot be negative: {value}")
         except Exception as e:
             print(e)
 
     def parse_connection(line) -> Connection:
         try:
-            hub1, hub2 = line.split("=")
+            hub1, hub2 = line.split("-")
             if not Parser.is_valid_hub(hub1):
                 raise ValueError(f"Line: {line}. {hub1} isn't a valid hub !")
             if not Parser.is_valid_hub(hub2):
@@ -93,8 +97,10 @@ class Parser:
             name, x, y, meta = line.split(" ")
             x = int(x)
             y = int(y)
-            dict_meta: dict = Parser.parse_meta(meta)
-            return Hub(name, x, y, dict_meta)
+            if meta:
+                dict_meta: dict = Parser.parse_meta(meta)
+                return Hub(name, x, y, dict_meta)
+            return Hub(name, x, y)
         except ValueError as e:
             print(e)
 
@@ -139,7 +145,7 @@ class Parser:
                     raise ValueError(f"{key} isn't a valid key")
             else:
                 raise ValueError(f"{key} isn't a valid key")
-            return res
+        return res
 
     def is_valid_hub(name: str) -> bool:
         for hub in Parser.hubs:
