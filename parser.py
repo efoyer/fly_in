@@ -109,7 +109,13 @@ class Parser:
 
     def parse_hub(line, n_line: int) -> Hub:
         try:
-            name, x, y, meta = line.split(" ")
+            if "[" in line and "]" in line:
+                val = line.split("[")[0].strip()
+                meta = line.split("[")[1].split("]")[0]
+                name, x, y = val.split(" ")
+            else:
+                name, x, y = line.split(" ")
+                meta = None
             x = int(x)
             y = int(y)
             if meta:
