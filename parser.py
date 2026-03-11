@@ -36,8 +36,12 @@ class Parser:
         try:
             b_start = False
             b_end = False
+            b_drones = False
             Parser.hubs = []
             Parser.lst_con = []
+            start = None
+            end = None
+            nb_drones = None
             with open(path, "r") as f:
                 i: int = 0
                 for line in f:
@@ -57,11 +61,18 @@ class Parser:
                     elif key == "hub":
                         hub = Parser.parse_hub(value, i)
                         Parser.hubs.append(hub)
-                    elif key == "nb_drones":
+                    elif key == "nb_drones" and not b_drones:
                         nb_drones = Parser.parse_nb_drones(value, i)
+                        b_drones = True
                     elif key == "connection":
                         connection = Parser.parse_connection(value, i)
                         Parser.lst_con.append(connection)
+                    elif key == "start_hub" and b_start:
+                        raise ValueError(f"Line {i}: Double start")
+                    elif key == "end_hub" and b_end:
+                        raise ValueError(f"Line {i}: Double end")
+                    elif key == "nb_drones" and b_drones:
+                        raise ValueError(f"Line {i}: Double nb_drones")
                     else:
                         continue
                 Parser.check_var(start, end, nb_drones)
@@ -150,7 +161,7 @@ class Parser:
         meta = meta.replace("[", "").replace("]", "")
 
         for data in meta.split(" "):
-            key, value = data.split("=")
+            key, value = data.split("=", 1)
             if key in (e.value for e in Meta_Type):
                 if key == "color":
                     if value in (c.value for c in Color):
