@@ -34,6 +34,8 @@ class Parser:
     @staticmethod
     def load(path: str) -> Graph:
         try:
+            b_start = False
+            b_end = False
             Parser.hubs = []
             Parser.lst_con = []
             with open(path, "r") as f:
@@ -44,10 +46,14 @@ class Parser:
                     if not line or line.startswith('#'):
                         continue
                     key, value = map(str.strip, line.split(":", 1))
-                    if key == "start_hub":
+                    if key == "start_hub" and not b_start:
                         start = Parser.parse_hub(value, i)
-                    elif key == "end_hub":
+                        Parser.hubs.append(start)
+                        b_start = True
+                    elif key == "end_hub" and not b_end:
                         end = Parser.parse_hub(value, i)
+                        Parser.hubs.append(end)
+                        b_end = True 
                     elif key == "hub":
                         hub = Parser.parse_hub(value, i)
                         Parser.hubs.append(hub)
@@ -120,6 +126,10 @@ class Parser:
                 meta = None
             x = int(x)
             y = int(y)
+            if x < 0:
+                raise ValueError(f"Line {n_line}: x:{x} < 0")
+            if y < 0:
+                raise ValueError(f"Line {n_line}: y:{y} < 0")
             if name in (h.get_name() for h in Parser.hubs):
                 raise ValueError(f"Line {n_line}: {name} already exists")
             if "-" in name:
@@ -132,7 +142,11 @@ class Parser:
             print(f"Line {n_line}: {e}")
 
     def parse_meta(meta: str, n_line: int) -> dict:
-        res = {}
+        res = {
+            "color": None,
+            "zone": "normal",
+            "max_drones": 1
+        }
         meta = meta.replace("[", "").replace("]", "")
 
         for data in meta.split(" "):
@@ -142,8 +156,7 @@ class Parser:
                     if value in (c.value for c in Color):
                         color = value
                     else:
-                        raise ValueError(f"Line {n_line}: "
-                                         f"{value} isn't a valid color !")
+                        color = None
                     res.update({
                         "color": color
                     })
@@ -187,11 +200,11 @@ class Parser:
             if hub.get_name() == name:
                 return hub
         raise ValueError("No Hub found ! (name_to_hub function)")
-    
+
     def check_var(start: any, end: any, nb_drones: any):
-        if not start:
+        if start is None:
             raise ValueError("start_hub does not exist")
-        if not end:
+        if end is None:
             raise ValueError("end_hub does not exist")
-        if not nb_drones:
+        if nb_drones is None:
             raise ValueError("nb_drones does not exist")
