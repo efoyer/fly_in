@@ -1,7 +1,7 @@
-from .hub import Hub
-from .graph import Graph
+from hub import Hub
+from graph import Graph
 from enum import Enum
-from .connection import Connection
+from connection import Connection
 
 
 class Meta_Type(Enum):
@@ -219,3 +219,7 @@ class Parser:
             raise ValueError("end_hub does not exist")
         if nb_drones is None:
             raise ValueError("nb_drones does not exist")
+
+if __name__ == "__main__":
+    graph: Graph = Parser.load("test.txt")
+    print(graph.get_infos())

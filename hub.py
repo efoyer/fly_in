@@ -10,3 +10,6 @@ class Hub:
 
     def get_name(self) -> str:
         return self.name
+    
+    def get_name_meta(self) -> str:
+        return f"{self.name} [{self.color} {self.zone} {self.max_drones}]"
