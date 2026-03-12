@@ -22,6 +22,21 @@ def dijkstra(g, src, target):
     return (float('inf'), ())
 
 
+def dijkstra_graph(g: Graph):
+    import heapq
+    adjaency = {}
+    for c in g.connect:
+        if c.end.cost is None:
+            continue
+        if c.start not in adjaency:
+            adjaency[c.start] = []
+        adjaency[c.start].append((c.end.cost, c.end))
+        if c.end not in adjaency:
+            adjaency[c.end] = []
+        adjaency[c.end].append((c.start.cost, c.start))
+
+
+
 if __name__ == '__main__':
     edges = [
         ('A', 'B', 7),
