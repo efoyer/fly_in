@@ -57,7 +57,7 @@ class Parser:
                     elif key == "end_hub" and not b_end:
                         end = Parser.parse_hub(value, i)
                         Parser.hubs.append(end)
-                        b_end = True 
+                        b_end = True
                     elif key == "hub":
                         hub = Parser.parse_hub(value, i)
                         Parser.hubs.append(hub)
@@ -150,7 +150,9 @@ class Parser:
                 return Hub(name, x, y, dict_meta)
             return Hub(name, x, y)
         except ValueError as e:
-            print(f"Line {n_line}: {e}")
+            raise ValueError(f"ValueError at line {n_line}: {e}")
+        except Exception as e:
+            print(f"Error at line {n_line}: {e}")
 
     def parse_meta(meta: str, n_line: int) -> dict:
         res = {
@@ -164,10 +166,7 @@ class Parser:
             key, value = data.split("=", 1)
             if key in (e.value for e in Meta_Type):
                 if key == "color":
-                    if value in (c.value for c in Color):
-                        color = value
-                    else:
-                        color = None
+                    color = value
                     res.update({
                         "color": color
                     })
@@ -220,6 +219,10 @@ class Parser:
         if nb_drones is None:
             raise ValueError("nb_drones does not exist")
 
+
 if __name__ == "__main__":
-    graph: Graph = Parser.load("test.txt")
-    print(graph.get_infos())
+    try:
+        graph: Graph = Parser.load("test.txt")
+        print(graph.get_infos())
+    except Exception as e:
+        print(f"Error: {e}")
