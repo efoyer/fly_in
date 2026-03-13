@@ -12,7 +12,8 @@ class Graph:
         self.end = end
 
     def get_infos(self):
-        hubs_list = "\n".join(f"  - {hub.get_name_meta()}" for hub in self.hubs)
+        hubs_list = "\n".join(f"  - {hub.get_name_meta()}"
+                              for hub in self.hubs)
         conn_list = "\n".join(f"  - {con.get_str()}" for con in self.connect)
         return (f"nb_drones: {self.nb_drones}\n"
                 f"start_hub: {self.start.get_name_meta()}\n"
