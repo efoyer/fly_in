@@ -2,27 +2,6 @@ from graph import Graph
 from parser import Parser
 
 
-def dijkstra(g, src, target):
-    import heapq
-    queue = [(0, src, ())]
-    visited, dist = set(), {src: 0.0}
-    while queue:
-        cost, node, path = heapq.heappop(queue)
-        if node not in visited:
-            visited.add(node)
-            path += (node,)
-            if node == target:
-                return (cost, path)
-
-            for cost2, node2 in g.get(node, ()):
-                if node2 in visited:
-                    continue
-                if cost + cost2 < dist.get(node2, float('inf')):
-                    dist[node2] = cost + cost2
-                    heapq.heappush(queue, (cost + cost2, node2, path))
-    return (float('inf'), ())
-
-
 def dijkstra_graph(g: Graph):
     import heapq
     adjaency = {}
@@ -60,4 +39,4 @@ if __name__ == '__main__':
     graph = Parser.load("maps/hard/01_maze_nightmare.txt")
     cost, path = dijkstra_graph(graph)
     print(f"Coût total: {cost}")
-print(f"Chemin: {' -> '.join(str(hub) for hub in path)}")
+    print(f"Chemin: {' -> '.join(str(hub) for hub in path)}")
