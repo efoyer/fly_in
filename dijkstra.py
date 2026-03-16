@@ -15,10 +15,15 @@ def dijkstra_graph(g: Graph):
             adjaency[c.end] = []
         adjaency[c.end].append((c.start.cost, c.start))
     i = 0
-    queue = [(0, i, g.start, ())]
+    if g.start.zone == "priority":
+        bonus = 0
+    else:
+        bonus = 1
+
+    queue = [(0, bonus, i, g.start, ())]
     visited, dist = set(), {g.start: 0.0}
     while queue:
-        cost, _, node, path = heapq.heappop(queue)
+        cost, bonus, _, node, path = heapq.heappop(queue)
         if node not in visited:
             visited.add(node)
             path += (node,)
@@ -28,10 +33,15 @@ def dijkstra_graph(g: Graph):
             for cost2, node2 in adjaency.get(node, ()):
                 if node2 in visited:
                     continue
+                if node2.zone == "priority":
+                    bonus_priority = 0
+                else:
+                    bonus_priority = 1
                 if cost + cost2 < dist.get(node2, float('inf')):
                     dist[node2] = cost + cost2
                     i += 1
-                    heapq.heappush(queue, (cost + cost2, i, node2, path))
+                    heapq.heappush(queue, (cost + cost2, bonus_priority,
+                                           i, node2, path))
     return (float('inf'), ())
 
 

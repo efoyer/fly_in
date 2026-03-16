@@ -2,6 +2,7 @@ from graph import Graph
 from parser import Parser
 from dijkstra import dijkstra_graph
 from drone import Drone
+from hub import Hub
 
 
 class ControlCenter:
@@ -24,8 +25,41 @@ class ControlCenter:
             print(drone.get_info())
             print()
 
+    def run(self):
+        while self.drones:
+            print(f"Turn {self.turn}: {self.step()}")
+            self.turn += 1
+
+    def step(self):
+        position: dict = {}
+        for drone in self.drones:
+            position[drone.position] = position.get(drone.position, 0) + 1
+        sort_drone = sorted(self.drones, key=lambda d: d.path_index,
+                            reverse=True)
+        move: list[str] = []
+        for drone in sort_drone:
+            if drone.waiting > 0:
+                drone.waiting -= 1
+                continue
+            next: Hub = drone.get_next_hub()
+            if next is None:
+                drone.is_arrived = True
+            else:
+                in_next = position.get(next, 0)
+                if in_next < next.max_drones:
+                    position[drone.position] = (
+                        position.get(drone.position, 0) - 1)
+                    position[next] = (position.get(next, 0) + 1)
+                    drone.to_next_hub(next)
+                    if next.zone == "restricted":
+                        drone.waiting = 1
+                    move.append(f"{drone.id}-{next.get_name()}")
+
+        self.drones = [drone for drone in self.drones if not drone.is_arrived]
+        return move
+
 
 if __name__ == "__main__":
     graph = Parser.load("test.txt")
     cc = ControlCenter(graph)
-    print(cc.get_drones())
+    cc.run()

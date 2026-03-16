@@ -16,7 +16,7 @@ class Hub:
         elif self.zone == "priority":
             self.cost = 1
         else:
-            self.cost = None
+            self.cost = 1
 
     def get_name(self) -> str:
         return self.name
