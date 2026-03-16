@@ -104,7 +104,15 @@ class Parser:
 
     def parse_connection(line: str, n_line: int) -> Connection:
         try:
-            hub1, hub2 = line.split("-")
+            max: int = 1
+            if "[" in line and "]" in line:
+                connection, meta = line.split(" ")
+                hub1, hub2 = connection.split("-")
+                key, value = meta.split("=")
+                if key == "max_link_capacity":
+                    max = int(value)
+            else:
+                hub1, hub2 = line.split("-")
             if not Parser.is_valid_hub(hub1):
                 raise ValueError(f"Line {n_line}: "
                                  f"{line}. {hub1} isn't a valid hub !")
@@ -119,12 +127,15 @@ class Parser:
                    c.get_str() == f"{hub2}-{hub1}"):
                     raise ValueError(f"Line {n_line}: "
                                      "Connection already exists")
+
             connex = Connection(Parser.name_to_hub(hub1),
-                                Parser.name_to_hub(hub2))
+                                Parser.name_to_hub(hub2), max)
             return connex
 
+        except ValueError as e:
+            print(f"ValueError at line {n_line}: {e}")
         except Exception as e:
-            print(e)
+            print(f"Exception at line {n_line}: {e}")
 
     def parse_hub(line, n_line: int) -> Hub:
         try:
@@ -137,10 +148,7 @@ class Parser:
                 meta = None
             x = int(x)
             y = int(y)
-            if x < 0:
-                raise ValueError(f"Line {n_line}: x:{x} < 0")
-            if y < 0:
-                raise ValueError(f"Line {n_line}: y:{y} < 0")
+
             if name in (h.get_name() for h in Parser.hubs):
                 raise ValueError(f"Line {n_line}: {name} already exists")
             if "-" in name:
