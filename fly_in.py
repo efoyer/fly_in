@@ -8,16 +8,19 @@ from hub import Hub
 class ControlCenter:
     def __init__(self, graph: Graph):
         self.graph = graph
-        _, self.path = dijkstra_graph(graph)
         self.turn = 0
         self.drones: list[Drone] = []
         self.load_drones()
 
     def load_drones(self) -> None:
         i = 1
+        load: dict = {}
         for drone in range(self.graph.nb_drones):
-            drone = Drone(f"D{i}", self.graph.start, self.path)
+            _, path = dijkstra_graph(graph, load)
+            drone = Drone(f"D{i}", self.graph.start, path)
             self.drones.append(drone)
+            for hub in path:
+                load[hub] = load.get(hub, 0) + 1
             i += 1
 
     def get_drones(self):

@@ -2,7 +2,7 @@ from graph import Graph
 from parser import Parser
 
 
-def dijkstra_graph(g: Graph):
+def dijkstra_graph(g: Graph, load: dict):
     import heapq
     adjaency = {}
     for c in g.connect:
@@ -37,10 +37,11 @@ def dijkstra_graph(g: Graph):
                     bonus_priority = 0
                 else:
                     bonus_priority = 1
-                if cost + cost2 < dist.get(node2, float('inf')):
-                    dist[node2] = cost + cost2
+                load_cost = cost2 + load.get(node2, 0)
+                if cost + load_cost < dist.get(node2, float('inf')):
+                    dist[node2] = cost + load_cost
                     i += 1
-                    heapq.heappush(queue, (cost + cost2, bonus_priority,
+                    heapq.heappush(queue, (cost + load_cost, bonus_priority,
                                            i, node2, path))
     return (float('inf'), ())
 
