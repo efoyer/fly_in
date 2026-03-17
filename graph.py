@@ -1,5 +1,6 @@
 from hub import Hub
 from connection import Connection
+from typing import Optional
 
 
 class Graph:
@@ -23,3 +24,10 @@ class Graph:
                 "List connection:\n"
                 f"{conn_list}"
                 )
+
+    def get_connection(self, hub1: Hub, hub2: Hub) -> Optional[Connection]:
+        for connect in self.connect:
+            if ((connect.start == hub1 and connect.end == hub2) or
+               (connect.start == hub2 and connect.end == hub1)):
+                return connect
+        return None

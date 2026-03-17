@@ -111,6 +111,9 @@ class Parser:
                 key, value = meta.split("=")
                 if key == "max_link_capacity":
                     max = int(value)
+                    if max < 1:
+                        raise ValueError(f"Line {n_line}: "
+                                         "max_link_capacity < 1")
             else:
                 hub1, hub2 = line.split("-")
             if not Parser.is_valid_hub(hub1):
