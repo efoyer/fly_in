@@ -108,6 +108,7 @@ class Parser:
             if "[" in line and "]" in line:
                 connection, meta = line.split(" ")
                 hub1, hub2 = connection.split("-")
+                meta = meta.replace("[", "").replace("]", "")
                 key, value = meta.split("=")
                 if key == "max_link_capacity":
                     max = int(value)

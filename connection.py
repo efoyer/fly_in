@@ -2,7 +2,7 @@ from hub import Hub
 
 
 class Connection:
-    def __init__(self,  start: Hub, end: Hub, max: int = 1):
+    def __init__(self,  start: Hub, end: Hub, max: int):
         self.start = start
         self.end = end
         self.max = max

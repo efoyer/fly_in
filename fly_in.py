@@ -20,7 +20,7 @@ class ControlCenter:
             _, path = dijkstra_graph(graph, load)
             drone = Drone(f"D{i}", self.graph.start, path)
             self.drones.append(drone)
-            print(f"{drone.id} path: {drone.path}")
+
             for hub in path:
                 load[hub] = load.get(hub, 0) + 1
             i += 1
@@ -71,7 +71,6 @@ class ControlCenter:
                         if next.zone == "restricted":
                             d.waiting = 1
                         res_str += f"{d.id}-{next.get_name()} "
-                    print(f"{d.id}: in_next={in_next}, max_drones={next.max_drones}, link={link_us.get(cn_to_next, 0)}, max_link={cn_to_next.max}")
 
             self.drones = [d for d in self.drones if not d.is_arrived]
             return res_str
@@ -80,7 +79,7 @@ class ControlCenter:
 
 
 if __name__ == "__main__":
-    #graph = Parser.load("maps/hard/03_ultimate_challenge.txt")
-    graph = Parser.load("test.txt")
+    graph = Parser.load("maps/hard/03_ultimate_challenge.txt")
+    #graph = Parser.load("test.txt")
     cc = ControlCenter(graph)
     cc.run()
