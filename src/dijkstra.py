@@ -1,5 +1,5 @@
-from graph import Graph
-from parser import Parser
+from src.graph import Graph
+from src.parser import Parser
 
 
 def dijkstra_graph(g: Graph, load: dict):

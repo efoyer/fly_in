@@ -1,8 +1,9 @@
-from graph import Graph
-from parser import Parser
-from dijkstra import dijkstra_graph
-from drone import Drone
-from hub import Hub
+from src.graph import Graph
+from src.parser import Parser
+from src.dijkstra import dijkstra_graph
+from src.drone import Drone
+from src.hub import Hub
+import sys
 
 
 class ControlCenter:
@@ -17,7 +18,7 @@ class ControlCenter:
         i = 1
         load: dict = {}
         for drone in range(self.graph.nb_drones):
-            _, path = dijkstra_graph(graph, load)
+            _, path = dijkstra_graph(self.graph, load)
             drone = Drone(f"D{i}", self.graph.start, path)
             self.drones.append(drone)
 
@@ -78,8 +79,16 @@ class ControlCenter:
             print(e)
 
 
+def main():
+    if len(sys.argv) == 2:
+        path = sys.argv[1]
+        graph = Parser.load(path)
+        cc = ControlCenter(graph)
+        cc.run()
+    else:
+        print("No arguments")
+        sys.exit(1)
+
+
 if __name__ == "__main__":
-    graph = Parser.load("maps/challenger/01_the_impossible_dream.txt")
-    # graph = Parser.load("test.txt")
-    cc = ControlCenter(graph)
-    cc.run()
+    main()

@@ -1,4 +1,4 @@
-from hub import Hub
+from src.hub import Hub
 
 
 class Connection:

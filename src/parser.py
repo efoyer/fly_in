@@ -1,7 +1,7 @@
-from hub import Hub
-from graph import Graph
+from src.hub import Hub
+from src.graph import Graph
 from enum import Enum
-from connection import Connection
+from src.connection import Connection
 import sys
 
 

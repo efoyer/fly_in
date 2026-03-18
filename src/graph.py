@@ -1,5 +1,5 @@
-from hub import Hub
-from connection import Connection
+from src.hub import Hub
+from src.connection import Connection
 from typing import Optional
 
 
