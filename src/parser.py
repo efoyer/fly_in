@@ -44,9 +44,11 @@ class Parser:
             end = None
             nb_drones = None
             with open(path, "r") as f:
-                i: int = 1
+                i: int = 0
+                l: int = 1
                 for line in f:
                     line = line.strip()
+                    i += 1
                     if not line or line.startswith('#'):
                         continue
                     if ":" not in line:
@@ -54,7 +56,7 @@ class Parser:
                                          " (':') \nReminder of the "
                                          "request structure: <key: value>")
                     key, value = map(str.strip, line.split(":", 1))
-                    if key != "nb_drones" and i == 1:
+                    if key != "nb_drones" and l == 1:
                         raise ValueError(f"Line: {i}: "
                                          "The file must begin with nb_drones")
                     if key == "start_hub" and not b_start:
@@ -84,7 +86,7 @@ class Parser:
                         raise ValueError(f"Line {i}: {key} isn't a valid key !"
                                          "\nValid key : nb_drones, start_hub, "
                                          "end_hub, hub, connection")
-                    i += 1
+                    l += 1
                 Parser.check_var(start, end, nb_drones)
                 if not Parser.check_to_end(end):
                     raise ValueError("ValueError: There are no connections "
@@ -109,7 +111,7 @@ class Parser:
 
     def parse_nb_drones(line: str, n_line: int) -> int:
         try:
-            line.strip()
+            line = line.strip()
             value: int = int(line)
             if value > 0:
                 return value
@@ -188,7 +190,7 @@ class Parser:
         except ValueError:
             raise ValueError(f"Line {n_line}: '{y}' isn't a integer")
         try:
-            if not Parser.check_coord(x, y):
+            if Parser.check_coord(x, y):
                 raise ValueError(f"Line {n_line}: "
                                  "The x y coordinates are already used")
             if x is None or y is None:
