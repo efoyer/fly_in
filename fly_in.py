@@ -74,12 +74,12 @@ class ControlCenter:
 
             self.drones = [d for d in self.drones if not d.is_arrived]
             return res_str
-        except (ValueError) as e:
+        except ValueError as e:
             print(e)
 
 
 if __name__ == "__main__":
-    graph = Parser.load("maps/hard/03_ultimate_challenge.txt")
-    #graph = Parser.load("test.txt")
+    graph = Parser.load("maps/challenger/01_the_impossible_dream.txt")
+    # graph = Parser.load("test.txt")
     cc = ControlCenter(graph)
     cc.run()

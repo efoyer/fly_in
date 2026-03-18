@@ -1,6 +1,10 @@
+
 nb_drones: 4
 start_hub: start 0 0
 end_hub: goal 2 0
-hub: A 1 0 [max_drones=2]
+hub: A 0 1 [max_drones=2]
+hub: B 0 1 [max_drones=2[max_drones=2]]
 connection: start-A [max_link_capacity=2]
-connection: A-goal [max_link_capacity=2]
+connection: B-A
+connection: B-goal
+
