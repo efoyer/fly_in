@@ -188,6 +188,9 @@ class Parser:
         except ValueError:
             raise ValueError(f"Line {n_line}: '{y}' isn't a integer")
         try:
+            if not Parser.check_coord(x, y):
+                raise ValueError(f"Line {n_line}: "
+                                 "The x y coordinates are already used")
             if x is None or y is None:
                 raise ValueError(f'Line {n_line}: x, y must not be None')
             if name in (h.get_name() for h in Parser.hubs):
@@ -285,10 +288,9 @@ class Parser:
                 return True
         return False
 
-
-if __name__ == "__main__":
-    try:
-        graph: Graph = Parser.load("test.txt")
-        print(graph.get_infos())
-    except Exception as e:
-        print(f"Error: {e}")
+    @staticmethod
+    def check_coord(x: int, y: int):
+        for hub in Parser.hubs:
+            if (hub.x == x and hub.y == y):
+                return True
+        return False
