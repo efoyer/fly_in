@@ -3,6 +3,7 @@ from src.parser import Parser
 from src.dijkstra import dijkstra_graph
 from src.drone import Drone
 from src.hub import Hub
+from src.visualisation import Visualizer
 import sys
 
 
@@ -85,6 +86,7 @@ def main():
         graph = Parser.load(path)
         cc = ControlCenter(graph)
         cc.run()
+        Visualizer.load_visu(graph)
     else:
         print("No arguments")
         sys.exit(1)

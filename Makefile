@@ -12,7 +12,7 @@ debug:
 	python3 -m pdb $(FNAME) $(ARG)
 
 clean:
-	rm -rf __pycache__ .mypy_cache *.pyc
+	rm -rf __pycache__ .mypy_cache *.pyc src/__pycache__
 
 lint:
 	python3 -m flake8 .
