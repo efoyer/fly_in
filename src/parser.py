@@ -134,7 +134,7 @@ class Parser:
                 key, value = meta.split("=")
                 if key == "max_link_capacity":
                     max_cap = int(value)
-                    if max < 1:
+                    if max_cap < 1:
                         raise ValueError(f"Line {n_line}: "
                                          "max_link_capacity < 1")
             else:
@@ -248,7 +248,7 @@ class Parser:
                                 "max_drones": max_drones
                             })
                     except ValueError as e:
-                        raise (f"Line {n_line}: {e}")
+                        raise ValueError(f"Line {n_line}: {e}")
                 else:
                     raise ValueError(f"Line {n_line}: {key} isn't a valid key")
             else:

@@ -15,13 +15,18 @@ clean:
 	rm -rf __pycache__ .mypy_cache *.pyc src/__pycache__
 
 lint:
-	python3 -m flake8 .
-	python3 -m mypy . --warn-return-any \
+	python3 -m flake8 . --exclude=venv
+	python3 -m mypy . --exclude=venv \ 
+		--warn-return-any \
 		--warn-unused-ignores \
 		--ignore-missing-imports \
 		--disallow-untyped-defs \
 		--check-untyped-defs
 
 lint-strict:
-	python3 -m flake8 .
-	python3 -m mypy . --strict
+	python3 -m flake8 . --exclude=venv
+	python3 -m mypy . --strict --exclude=venv
+
+venv:
+	python3 -m venv venv
+	. venv/bin/activate && pip install --upgrade pip && pip install $(MODULES)
