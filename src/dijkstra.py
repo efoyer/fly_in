@@ -22,6 +22,7 @@ def dijkstra_graph(g: Graph, load: dict):
 
     queue = [(0, bonus, i, g.start, ())]
     visited, dist = set(), {g.start: 0.0}
+
     while queue:
         cost, bonus, _, node, path = heapq.heappop(queue)
         if node not in visited:

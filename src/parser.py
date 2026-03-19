@@ -218,6 +218,8 @@ class Parser:
             if key in (e.value for e in Meta_Type):
                 if key == "color":
                     color = value
+                    if color == "rainbow":
+                        color = "cyan"
                     res.update({
                         "color": color
                     })

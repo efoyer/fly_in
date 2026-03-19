@@ -38,6 +38,7 @@ class ControlCenter:
             if moves:
                 print(f"Turn {self.turn}: {moves}")
                 self.turn += 1
+        self.turn -= 1
 
     def step(self):
         try:
@@ -81,14 +82,17 @@ class ControlCenter:
 
 
 def main():
-    if len(sys.argv) == 2:
-        path = sys.argv[1]
-        graph = Parser.load(path)
-        cc = ControlCenter(graph)
-        cc.run()
-        Visualizer.load_visu(graph, sys.argv[0])
-    else:
-        print("No arguments")
+    try:
+        if len(sys.argv) == 2:
+            path = sys.argv[1]
+            graph = Parser.load(path)
+            cc = ControlCenter(graph)
+            cc.run()
+            Visualizer.load_visu(graph, sys.argv[1], cc.turn)
+        else:
+            print("No arguments")
+            sys.exit(1)
+    except KeyboardInterrupt:
         sys.exit(1)
 
 

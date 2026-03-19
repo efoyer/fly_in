@@ -1,6 +1,6 @@
 FNAME = fly_in.py
 ARG ?=
-MODULES = flake8 mypy matplotlib
+MODULES = flake8 mypy matplotlib mplcursors
 
 run:
 	python3 $(FNAME) $(ARG)
