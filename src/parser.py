@@ -105,6 +105,8 @@ class Parser:
         except ValueError as e:
             print(e)
             sys.exit(1)
+        except IsADirectoryError:
+            print(f"<{path}> is a directory !")
         except Exception as e:
             print(f"Error at line {i}: {e}")
             sys.exit(1)

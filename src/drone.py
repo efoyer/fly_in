@@ -8,7 +8,8 @@ class Drone:
         self.path = path
         self.path_index = 0
         self.is_arrived = False
-        self.waiting = 0
+        self.dest_res = None
+        self.transit = False
 
     def get_next_hub(self):
         if not self.is_arrived and self.path_index + 1 < len(self.path):

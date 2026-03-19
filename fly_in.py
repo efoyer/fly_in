@@ -44,6 +44,7 @@ class ControlCenter:
         try:
             position: dict = {}
             link_us: dict = {}
+
             for drone in self.drones:
                 position[drone.position] = position.get(drone.position, 0) + 1
 
@@ -51,14 +52,20 @@ class ControlCenter:
                                 reverse=True)
             res_str: str = ""
             for d in sort_drone:
-                if d.waiting > 0:
-                    d.waiting -= 1
-                    continue
-
-                next: Hub = d.get_next_hub()
+                if d.transit:
+                    next = d.dest_res
+                    d.dest_res = None
+                else:
+                    next: Hub = d.get_next_hub()
                 if next is None:
                     d.is_arrived = True
+                elif next.zone == "restricted" and not d.transit:
+                    d.transit = True
+                    d.dest_res = next
+                    cn_to_next = self.graph.get_connection(d.position, next)
+                    res_str += f"{d.id}-{cn_to_next.get_str()}"
                 else:
+                    d.transit = False
                     cn_to_next = self.graph.get_connection(d.position, next)
                     if cn_to_next is None:
                         raise ValueError(f"Error at turn {self.turn}: "
@@ -66,13 +73,13 @@ class ControlCenter:
                     in_next = position.get(next, 0)
                     if (in_next < next.max_drones and
                        link_us.get(cn_to_next, 0) < cn_to_next.max):
+
                         position[d.position] = (
                             position.get(d.position, 0) - 1)
                         position[next] = (position.get(next, 0) + 1)
                         link_us[cn_to_next] = link_us.get(cn_to_next, 0) + 1
                         d.to_next_hub(next)
-                        if next.zone == "restricted":
-                            d.waiting = 1
+
                         res_str += f"{d.id}-{next.get_name()} "
 
             self.drones = [d for d in self.drones if not d.is_arrived]
