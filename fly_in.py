@@ -86,7 +86,7 @@ def main():
         graph = Parser.load(path)
         cc = ControlCenter(graph)
         cc.run()
-        Visualizer.load_visu(graph)
+        Visualizer.load_visu(graph, sys.argv[0])
     else:
         print("No arguments")
         sys.exit(1)

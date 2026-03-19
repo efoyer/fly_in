@@ -1,6 +1,6 @@
 FNAME = fly_in.py
 ARG ?=
-MODULES = flake8 mypy
+MODULES = flake8 mypy matplotlib
 
 run:
 	python3 $(FNAME) $(ARG)

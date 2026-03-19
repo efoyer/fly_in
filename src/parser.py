@@ -190,9 +190,6 @@ class Parser:
         except ValueError:
             raise ValueError(f"Line {n_line}: '{y}' isn't a integer")
         try:
-            if Parser.check_coord(x, y):
-                raise ValueError(f"Line {n_line}: "
-                                 "The x y coordinates are already used")
             if x is None or y is None:
                 raise ValueError(f'Line {n_line}: x, y must not be None')
             if name in (h.get_name() for h in Parser.hubs):
@@ -287,12 +284,5 @@ class Parser:
     def check_begin_con(start: Hub):
         for con in Parser.lst_con:
             if con.start == start:
-                return True
-        return False
-
-    @staticmethod
-    def check_coord(x: int, y: int):
-        for hub in Parser.hubs:
-            if (hub.x == x and hub.y == y):
                 return True
         return False

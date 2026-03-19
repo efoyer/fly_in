@@ -1,15 +1,17 @@
 import matplotlib.pyplot as plt
-import numpy as np
+# import numpy as np
 from src.graph import Graph
-from src.hub import Hub
 
 
 class Visualizer:
     @staticmethod
-    def load_visu(graph: Graph):
-        x_pos = [hub.x for hub in graph.hubs]
-        y_pos = [hub.y for hub in graph.hubs]
-        xpoints = np.array(x_pos)
-        ypoints = np.array(y_pos)
-        plt.plot(xpoints, ypoints, 'o')
+    def load_visu(graph: Graph, map: str):
+
+        for h in graph.hubs:
+            plt.scatter(h.x, h.y, h.color, 200)
+            plt.text(h.x + 0.02, h.y + 0.002, h.name, 0)
+
+        for c in graph.connect:
+            plt.plot(c.start.x, c.end.y, 'black')
+        plt.gcf().canvas.manager.set_window_title(map)
         plt.show()
