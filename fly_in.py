@@ -3,8 +3,10 @@ from src.parser import Parser
 from src.dijkstra import dijkstra_graph
 from src.drone import Drone
 from src.hub import Hub
+from src.connection import Connection
 from src.visualisation import Visualizer
 import sys
+from typing import Optional
 
 
 class ControlCenter:
@@ -17,8 +19,8 @@ class ControlCenter:
 
     def load_drones(self) -> None:
         i = 1
-        load: dict = {}
-        for drone in range(self.graph.nb_drones):
+        load: dict[Hub, int] = {}
+        for _ in range(self.graph.nb_drones):
             _, path = dijkstra_graph(self.graph, load)
             drone = Drone(f"D{i}", self.graph.start, path)
             self.drones.append(drone)
@@ -27,12 +29,12 @@ class ControlCenter:
                 load[hub] = load.get(hub, 0) + 1
             i += 1
 
-    def get_drones(self):
+    def get_drones(self) -> None:
         for drone in self.drones:
             print(drone.get_info())
             print()
 
-    def run(self):
+    def run(self) -> None:
         while self.drones:
             moves = self.step()
             if moves:
@@ -40,10 +42,10 @@ class ControlCenter:
                 self.turn += 1
         self.turn -= 1
 
-    def step(self):
+    def step(self) -> Optional[str]:
         try:
-            position: dict = {}
-            link_us: dict = {}
+            position: dict[Hub, int] = {}
+            link_us: dict[Connection, int] = {}
 
             for drone in self.drones:
                 position[drone.position] = position.get(drone.position, 0) + 1
@@ -88,7 +90,7 @@ class ControlCenter:
             print(e)
 
 
-def main():
+def main() -> None:
     try:
         if len(sys.argv) == 2:
             path = sys.argv[1]

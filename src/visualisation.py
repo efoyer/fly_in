@@ -7,7 +7,7 @@ import matplotlib.colors as mcolors
 
 class Visualizer:
     @staticmethod
-    def load_visu(graph: Graph, map: str, turn: int):
+    def load_visu(graph: Graph, map: str, turn: int) -> None:
         scatters = []
         for h in graph.hubs:
             color = h.color
@@ -21,7 +21,7 @@ class Visualizer:
                                    hover=mplcursors.HoverMode.Transient)
 
         @cursor.connect("add")
-        def on_add(sel):
+        def on_add(sel) -> None:
             hub = next(h for sc, h in scatters if sc == sel.artist)
             sel.annotation.set_text(
                 f"Name: {hub.name}\n"

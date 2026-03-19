@@ -123,16 +123,17 @@ class Parser:
         except Exception as e:
             raise Exception(f"Exception at line {n_line}: {e}")
 
+    @staticmethod
     def parse_connection(line: str, n_line: int) -> Connection:
         try:
-            max: int = 1
+            max_cap: int = 1
             if "[" in line and "]" in line:
                 connection, meta = line.split(" ")
                 hub1, hub2 = connection.split("-")
                 meta = meta.replace("[", "").replace("]", "")
                 key, value = meta.split("=")
                 if key == "max_link_capacity":
-                    max = int(value)
+                    max_cap = int(value)
                     if max < 1:
                         raise ValueError(f"Line {n_line}: "
                                          "max_link_capacity < 1")
@@ -151,7 +152,7 @@ class Parser:
                     raise ValueError("Connection already exists")
 
             connex = Connection(Parser.name_to_hub(hub1),
-                                Parser.name_to_hub(hub2), max)
+                                Parser.name_to_hub(hub2), max_cap)
             return connex
 
         except ValueError as e:
@@ -159,6 +160,7 @@ class Parser:
         except Exception as e:
             raise Exception(f"Exception at line {n_line}: {e}")
 
+    @staticmethod
     def parse_hub(line, n_line: int) -> Hub:
         if "[" in line and "]" in line:
             try:
@@ -199,7 +201,7 @@ class Parser:
             if "-" in name:
                 raise ValueError(f"Line {n_line}: '-' not allowed in the name")
             if meta:
-                dict_meta: dict = Parser.parse_meta(meta, n_line)
+                dict_meta: dict[str, object] = Parser.parse_meta(meta, n_line)
                 return Hub(name, x, y, dict_meta)
             return Hub(name, x, y)
         except ValueError as e:
@@ -207,6 +209,7 @@ class Parser:
         except Exception as e:
             raise Exception(f"Error at line {n_line}: {e}")
 
+    @staticmethod
     def parse_meta(meta: str, n_line: int) -> dict:
         res = {
             "color": None,
@@ -269,7 +272,7 @@ class Parser:
         raise ValueError("No Hub found ! (name_to_hub function)")
 
     @staticmethod
-    def check_var(start: any, end: any, nb_drones: any):
+    def check_var(start: any, end: any, nb_drones: any) -> None:
         if start is None:
             raise ValueError("start_hub does not exist")
         if end is None:
@@ -278,14 +281,14 @@ class Parser:
             raise ValueError("nb_drones does not exist")
 
     @staticmethod
-    def check_to_end(end: Hub):
+    def check_to_end(end: Hub) -> bool:
         for con in Parser.lst_con:
             if con.end == end:
                 return True
         return False
 
     @staticmethod
-    def check_begin_con(start: Hub):
+    def check_begin_con(start: Hub) -> bool:
         for con in Parser.lst_con:
             if con.start == start:
                 return True

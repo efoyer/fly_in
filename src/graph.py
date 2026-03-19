@@ -12,7 +12,7 @@ class Graph:
         self.start = start
         self.end = end
 
-    def get_infos(self):
+    def get_infos(self) -> str:
         hubs_list = "\n".join(f"  - {hub.get_name_meta()}"
                               for hub in self.hubs)
         conn_list = "\n".join(f"  - {con.get_str()}" for con in self.connect)

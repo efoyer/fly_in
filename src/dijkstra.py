@@ -1,10 +1,12 @@
 from src.graph import Graph
 from src.parser import Parser
+from src.hub import Hub
+import heapq
 
 
-def dijkstra_graph(g: Graph, load: dict):
-    import heapq
-    adjaency = {}
+def dijkstra_graph(g: Graph,
+                   load: dict[Hub, int]) -> tuple[float, tuple[Hub, ...]]:
+    adjaency: dict = {}
     for c in g.connect:
         if c.end.cost is None or c.start.cost is None:
             continue
@@ -20,14 +22,14 @@ def dijkstra_graph(g: Graph, load: dict):
     else:
         bonus = 1
 
-    queue = [(0, bonus, i, g.start, ())]
+    queue: dict[int, int, int, Hub, tuple] = [(0, bonus, i, g.start, ())]
     visited, dist = set(), {g.start: 0.0}
 
     while queue:
         cost, bonus, _, node, path = heapq.heappop(queue)
         if node not in visited:
             visited.add(node)
-            path += (node,)
+            path = path + (node,)
             if node == g.end:
                 return (cost, path)
 
