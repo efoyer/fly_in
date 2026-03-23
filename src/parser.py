@@ -2,8 +2,8 @@ from src.hub import Hub
 from src.graph import Graph
 from enum import Enum
 from src.connection import Connection
+from typing import TypedDict
 import sys
-from typing import Any
 
 
 class Meta_Type(Enum):
@@ -29,6 +29,12 @@ class Color(Enum):
     PINK = "pink"
 
 
+class MetaDict(TypedDict):
+    color: str | None
+    zone: str
+    max_drones: int
+
+
 class Parser:
     hubs: list[Hub] = []
     lst_con: list[Connection] = []
@@ -41,8 +47,8 @@ class Parser:
             b_drones = False
             Parser.hubs = []
             Parser.lst_con = []
-            start = None
-            end = None
+            start: Hub | None = None
+            end: Hub | None = None
             nb_drones: int | None = None
             with open(path, "r") as f:
                 i: int = 0
@@ -62,7 +68,8 @@ class Parser:
                                          "The file must begin with nb_drones")
                     if key == "start_hub" and not b_start:
                         start = Parser.parse_hub(value, i)
-                        Parser.hubs.append(start)
+                        if start is not None:
+                            Parser.hubs.append(start)
                         b_start = True
                     elif key == "end_hub" and not b_end:
                         end = Parser.parse_hub(value, i)
@@ -88,10 +95,13 @@ class Parser:
                                          "\nValid key : nb_drones, start_hub, "
                                          "end_hub, hub, connection")
                     l += 1
-                Parser.check_var(start, end, nb_drones)
+                Parser.check_var(end, nb_drones)
                 if not Parser.check_to_end(end):
                     raise ValueError("ValueError: There are no connections "
                                      "linked to the output")
+                assert nb_drones is not None
+                assert start is not None
+                assert end is not None
                 return Graph(nb_drones=nb_drones,
                              start=start,
                              end=end,
@@ -108,6 +118,7 @@ class Parser:
             sys.exit(1)
         except IsADirectoryError:
             print(f"<{path}> is a directory !")
+            sys.exit(1)
         except Exception as e:
             print(f"Error at line {i}: {e}")
             sys.exit(1)
@@ -128,8 +139,11 @@ class Parser:
     @staticmethod
     def parse_connection(line: str, n_line: int) -> Connection:
         try:
+            hub1: str
+            hub2: str
             max_cap: int = 1
             if "[" in line and "]" in line:
+                meta: str | None
                 connection, meta = line.split(" ")
                 hub1, hub2 = connection.split("-")
                 meta = meta.replace("[", "").replace("]", "")
@@ -163,7 +177,7 @@ class Parser:
             raise Exception(f"Exception at line {n_line}: {e}")
 
     @staticmethod
-    def parse_hub(line: str, n_line: int) -> Hub | None:
+    def parse_hub(line: str, n_line: int) -> Hub:
         if "[" in line and "]" in line:
             try:
                 val = line.split("[")[0].strip()
@@ -176,23 +190,23 @@ class Parser:
                 raise ValueError(f"Line {n_line}: Error in split for meta")
 
             try:
-                name, x, y = val.split(" ")
+                name, x_str, y_str = val.split(" ")
             except ValueError:
                 raise ValueError(f"Line {n_line}: The line should be: "
                                  "name, x, y [optional meta]")
         else:
             try:
-                name, x, y = line.split(" ")
+                name, x_str, y_str = line.split(" ")
             except ValueError:
                 raise ValueError(f"Line {n_line}: The line should be: "
                                  "name, x, y [optional meta]")
             meta = None
         try:
-            x = int(x)
+            x = int(x_str)
         except ValueError:
             raise ValueError(f"Line {n_line}: '{x}' isn't a integer")
         try:
-            y = int(y)
+            y = int(y_str)
         except ValueError:
             raise ValueError(f"Line {n_line}: '{y}' isn't a integer")
         try:
@@ -203,7 +217,7 @@ class Parser:
             if "-" in name:
                 raise ValueError(f"Line {n_line}: '-' not allowed in the name")
             if meta:
-                dict_meta: dict[str, object] = Parser.parse_meta(meta, n_line)
+                dict_meta: MetaDict = Parser.parse_meta(meta, n_line)
                 return Hub(name, x, y, dict_meta)
             return Hub(name, x, y)
         except ValueError as e:
@@ -212,8 +226,8 @@ class Parser:
             raise Exception(f"Error at line {n_line}: {e}")
 
     @staticmethod
-    def parse_meta(meta: str, n_line: int) -> dict[str | None, str | int]:
-        res = {
+    def parse_meta(meta: str, n_line: int) -> MetaDict:
+        res: MetaDict = {
             "color": None,
             "zone": "normal",
             "max_drones": 1
@@ -274,9 +288,7 @@ class Parser:
         raise ValueError("No Hub found ! (name_to_hub function)")
 
     @staticmethod
-    def check_var(start: Any, end: Any, nb_drones: Any) -> None:
-        if start is None:
-            raise ValueError("start_hub does not exist")
+    def check_var(end: Hub | None, nb_drones: int | None) -> None:
         if end is None:
             raise ValueError("end_hub does not exist")
         if nb_drones is None:

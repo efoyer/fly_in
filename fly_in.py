@@ -14,7 +14,7 @@ class ControlCenter:
         self.graph = graph
         self.turn = 1
         self.drones: list[Drone] = []
-        self.load = {}
+        self.load: dict[Hub, int] = {}
         self.load_drones()
 
     def load_drones(self) -> None:
@@ -55,39 +55,46 @@ class ControlCenter:
             res_str: str = ""
             for d in sort_drone:
                 if d.transit:
-                    next = d.dest_res
+                    nh = d.dest_res
                     d.dest_res = None
                 else:
-                    next: Hub = d.get_next_hub()
-                if next is None:
+                    nh = d.get_next_hub()
+                next_hub = nh
+                if next_hub is None:
                     d.is_arrived = True
-                elif next.zone == "restricted" and not d.transit:
+                elif (next_hub.zone == "restricted" and not d.transit):
                     d.transit = True
-                    d.dest_res = next
-                    cn_to_next = self.graph.get_connection(d.position, next)
-                    res_str += f"{d.id}-{cn_to_next.get_str()}"
+                    d.dest_res = next_hub
+                    cn_to_next = self.graph.get_connection(
+                        d.position, next_hub)
+                    if cn_to_next is None:
+                        raise ValueError(f"Error at turn {self.turn}:"
+                                         f" {d.id} has an invalid connection")
+                    res_str += f"{d.id}-{cn_to_next.get_str()} "
                 else:
                     d.transit = False
-                    cn_to_next = self.graph.get_connection(d.position, next)
+                    cn_to_next = self.graph.get_connection(
+                        d.position, next_hub)
                     if cn_to_next is None:
                         raise ValueError(f"Error at turn {self.turn}: "
                                          f"{d.id} has an invalid connection")
-                    in_next = position.get(next, 0)
-                    if (in_next < next.max_drones and
+                    in_next = position.get(next_hub, 0)
+                    if (in_next < next_hub.max_drones and
                        link_us.get(cn_to_next, 0) < cn_to_next.max):
 
                         position[d.position] = (
                             position.get(d.position, 0) - 1)
-                        position[next] = (position.get(next, 0) + 1)
+                        position[next_hub] = (position.get(next_hub, 0) + 1)
                         link_us[cn_to_next] = link_us.get(cn_to_next, 0) + 1
-                        d.to_next_hub(next)
+                        d.to_next_hub(next_hub)
 
-                        res_str += f"{d.id}-{next.get_name()} "
+                        res_str += f"{d.id}-{next_hub.get_name()} "
 
             self.drones = [d for d in self.drones if not d.is_arrived]
             return res_str
         except ValueError as e:
             print(e)
+            return None
 
 
 def main() -> None:

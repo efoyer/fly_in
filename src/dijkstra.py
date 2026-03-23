@@ -1,12 +1,11 @@
 from src.graph import Graph
-from src.parser import Parser
 from src.hub import Hub
 import heapq
 
 
 def dijkstra_graph(g: Graph,
                    load: dict[Hub, int]) -> tuple[float, tuple[Hub, ...]]:
-    adjaency: dict = {}
+    adjaency: dict[Hub, list[tuple[int, Hub]]] = {}
     for c in g.connect:
         if c.end.cost is None or c.start.cost is None:
             continue
@@ -22,7 +21,8 @@ def dijkstra_graph(g: Graph,
     else:
         bonus = 1
 
-    queue: dict[int, int, int, Hub, tuple] = [(0, bonus, i, g.start, ())]
+    queue: list[tuple[int, int, int, Hub, tuple[Hub, ...]]] = [
+        (0, bonus, i, g.start, ())]
     visited, dist = set(), {g.start: 0.0}
 
     while queue:
@@ -47,10 +47,3 @@ def dijkstra_graph(g: Graph,
                     heapq.heappush(queue, (cost + load_cost, bonus_priority,
                                            i, node2, path))
     return (float('inf'), ())
-
-
-if __name__ == '__main__':
-    graph = Parser.load("maps/hard/01_maze_nightmare.txt")
-    cost, path = dijkstra_graph(graph)
-    print(f"Coût total: {cost}")
-    print(f"Chemin: {' -> '.join(str(hub) for hub in path)}")

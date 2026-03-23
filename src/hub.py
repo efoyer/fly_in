@@ -1,16 +1,27 @@
 from typing import Optional
+from typing import TypedDict
+
+
+class MetaDict(TypedDict):
+    color: str | None
+    zone: str
+    max_drones: int
 
 
 class Hub:
     def __init__(self, name: str, x: int, y: int,
-                 meta: Optional[dict[str, object]] = None):
+                 meta: MetaDict | None = None):
         self.name = name
         self.x = x
         self.y = y
-        self.color: Optional[str | object] = (meta or {}).get("color", None)
-        self.zone: Optional[str | object] = (meta or {}).get("zone", "normal")
-        self.max_drones: Optional[str | object] = (meta or {}).get(
-            "max_drones", 1)
+        if meta is None:
+            self.color = None
+            self.zone = "normal"
+            self.max_drones = 1
+        else:
+            self.color = meta["color"]
+            self.zone = meta["zone"]
+            self.max_drones = meta["max_drones"]
         self.cost: Optional[int] = None
         if self.zone == "normal" or self.zone == "priority":
             self.cost = 1
