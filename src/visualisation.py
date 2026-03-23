@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import mplcursors
-# import numpy as np
 from src.graph import Graph
 import matplotlib.colors as mcolors
 

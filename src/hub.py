@@ -7,17 +7,19 @@ class Hub:
         self.name = name
         self.x = x
         self.y = y
-        self.color: Optional[str] = (meta or {}).get("color", None)
-        self.zone: Optional[str] = (meta or {}).get("zone", "normal")
-        self.max_drones: Optional[str] = (meta or {}).get("max_drones", 1)
+        self.color: Optional[str | object] = (meta or {}).get("color", None)
+        self.zone: Optional[str | object] = (meta or {}).get("zone", "normal")
+        self.max_drones: Optional[str | object] = (meta or {}).get(
+            "max_drones", 1)
+        self.cost: Optional[int] = None
         if self.zone == "normal" or self.zone == "priority":
-            self.cost: Optional[int] = 1
+            self.cost = 1
         elif self.zone == "blocked":
-            self.cost: Optional[int] = None
+            self.cost = None
         elif self.zone == "restricted":
-            self.cost: Optional[int] = 2
+            self.cost = 2
         else:
-            self.cost: Optional[int] = 1
+            self.cost = 1
 
     def get_name(self) -> str:
         return self.name

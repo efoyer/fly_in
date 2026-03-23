@@ -3,6 +3,7 @@ from src.graph import Graph
 from enum import Enum
 from src.connection import Connection
 import sys
+from typing import Any
 
 
 class Meta_Type(Enum):
@@ -42,7 +43,7 @@ class Parser:
             Parser.lst_con = []
             start = None
             end = None
-            nb_drones = None
+            nb_drones: int | None = None
             with open(path, "r") as f:
                 i: int = 0
                 l: int = 1
@@ -111,6 +112,7 @@ class Parser:
             print(f"Error at line {i}: {e}")
             sys.exit(1)
 
+    @staticmethod
     def parse_nb_drones(line: str, n_line: int) -> int:
         try:
             line = line.strip()
@@ -161,7 +163,7 @@ class Parser:
             raise Exception(f"Exception at line {n_line}: {e}")
 
     @staticmethod
-    def parse_hub(line, n_line: int) -> Hub:
+    def parse_hub(line: str, n_line: int) -> Hub | None:
         if "[" in line and "]" in line:
             try:
                 val = line.split("[")[0].strip()
@@ -210,7 +212,7 @@ class Parser:
             raise Exception(f"Error at line {n_line}: {e}")
 
     @staticmethod
-    def parse_meta(meta: str, n_line: int) -> dict:
+    def parse_meta(meta: str, n_line: int) -> dict[str | None, str | int]:
         res = {
             "color": None,
             "zone": "normal",
@@ -272,7 +274,7 @@ class Parser:
         raise ValueError("No Hub found ! (name_to_hub function)")
 
     @staticmethod
-    def check_var(start: any, end: any, nb_drones: any) -> None:
+    def check_var(start: Any, end: Any, nb_drones: Any) -> None:
         if start is None:
             raise ValueError("start_hub does not exist")
         if end is None:
@@ -281,7 +283,7 @@ class Parser:
             raise ValueError("nb_drones does not exist")
 
     @staticmethod
-    def check_to_end(end: Hub) -> bool:
+    def check_to_end(end: Hub | None) -> bool:
         for con in Parser.lst_con:
             if con.end == end:
                 return True

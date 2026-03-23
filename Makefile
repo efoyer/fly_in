@@ -16,7 +16,8 @@ clean:
 
 lint:
 	python3 -m flake8 . --exclude=venv
-	python3 -m mypy . --exclude=venv \ 
+	python3 -m mypy . --exclude=venv \
+		--explicit-package-bases \
 		--warn-return-any \
 		--warn-unused-ignores \
 		--ignore-missing-imports \
@@ -25,7 +26,7 @@ lint:
 
 lint-strict:
 	python3 -m flake8 . --exclude=venv
-	python3 -m mypy . --strict --exclude=venv
+	python3 -m mypy . --strict --exclude=venv --explicit-package-bases
 
 venv:
 	python3 -m venv venv
