@@ -4,3 +4,4 @@ venv/
 *.pdf
 *.txt
 .mypy_cache/
+fly_in_livecode.py

@@ -63,7 +63,7 @@ class ControlCenter:
                         cn_to_next = self.graph.get_connection(
                             d.position, nh)
                         if cn_to_next is None:
-                            raise ValueError("Errorrrrr")
+                            raise ValueError(f"Error at turn {self.turn}")
                         position[d.position] = (
                             position.get(d.position, 0) - 1)
                         position[nh] = (position.get(nh, 0) + 1)
