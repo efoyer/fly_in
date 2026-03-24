@@ -56,39 +56,76 @@ class ControlCenter:
             for d in sort_drone:
                 if d.transit:
                     nh = d.dest_res
-                    d.dest_res = None
-                else:
-                    nh = d.get_next_hub()
-                next_hub = nh
-                if next_hub is None:
-                    d.is_arrived = True
-                elif (next_hub.zone == "restricted" and not d.transit):
-                    d.transit = True
-                    d.dest_res = next_hub
-                    cn_to_next = self.graph.get_connection(
-                        d.position, next_hub)
-                    if cn_to_next is None:
-                        raise ValueError(f"Error at turn {self.turn}:"
-                                         f" {d.id} has an invalid connection")
-                    res_str += f"{d.id}-{cn_to_next.get_str()} "
-                else:
-                    d.transit = False
-                    cn_to_next = self.graph.get_connection(
-                        d.position, next_hub)
-                    if cn_to_next is None:
-                        raise ValueError(f"Error at turn {self.turn}: "
-                                         f"{d.id} has an invalid connection")
-                    in_next = position.get(next_hub, 0)
-                    if (in_next < next_hub.max_drones and
-                       link_us.get(cn_to_next, 0) < cn_to_next.max):
-
+                    if nh is None:
+                        raise ValueError(f"Error at turn {self.turn}")
+                    in_next = position.get(nh, 0)
+                    if in_next < nh.max_drones:
+                        cn_to_next = self.graph.get_connection(
+                            d.position, nh)
+                        if cn_to_next is None:
+                            raise ValueError("Errorrrrr")
                         position[d.position] = (
                             position.get(d.position, 0) - 1)
-                        position[next_hub] = (position.get(next_hub, 0) + 1)
+                        position[nh] = (position.get(nh, 0) + 1)
+                        d.transit = False
+                        d.dest_res = None
                         link_us[cn_to_next] = link_us.get(cn_to_next, 0) + 1
-                        d.to_next_hub(next_hub)
+                        d.to_next_hub(nh)
+                        res_str += f"{d.id}-{nh.get_name()}"
+                    else:
+                        raise ValueError("Errorr")
 
-                        res_str += f"{d.id}-{next_hub.get_name()} "
+                else:
+                    nh = d.get_next_hub()
+                    next_hub = nh
+
+                    if next_hub is None:
+                        d.is_arrived = True
+                    else:
+                        cn_to_next = self.graph.get_connection(
+                            d.position, next_hub)
+                        in_next = position.get(next_hub, 0)
+                        if cn_to_next is None:
+                            raise ValueError(f"Error at turn {self.turn}: "
+                                             f"{d.id} has an invalid "
+                                             "connection")
+
+                        if (next_hub.zone == "restricted" and not d.transit
+                            and in_next < next_hub.max_drones and
+                           link_us.get(cn_to_next, 0) < cn_to_next.max):
+                            d.transit = True
+                            d.dest_res = next_hub
+                            cn_to_next = self.graph.get_connection(
+                                d.position, next_hub)
+                            in_next = position.get(next_hub, 0)
+                            position[next_hub] = (position.get(
+                                next_hub, 0) + 1)
+                            link_us[cn_to_next] = link_us.get(
+                                cn_to_next, 0) + 1
+                            if cn_to_next is None:
+                                raise ValueError(f"Error at turn {self.turn}:"
+                                                 f" {d.id} has an invalid "
+                                                 "connection")
+                            res_str += f"{d.id}-{cn_to_next.get_str()} "
+                        else:
+                            d.transit = False
+                            if cn_to_next is None:
+                                raise ValueError(f"Error at turn {self.turn}: "
+                                                 f"{d.id} has an invalid "
+                                                 "connection")
+
+                            if (in_next < next_hub.max_drones and
+                               link_us.get(cn_to_next, 0) < cn_to_next.max):
+
+                                position[d.position] = (
+                                    position.get(d.position, 0) - 1)
+                                position[next_hub] = (
+                                    position.get(next_hub, 0) + 1)
+                                link_us[cn_to_next] = link_us.get(
+                                    cn_to_next, 0) + 1
+                                d.to_next_hub(next_hub)
+
+                                res_str += f"{d.id}-{next_hub.get_name()} "
 
             self.drones = [d for d in self.drones if not d.is_arrived]
             return res_str

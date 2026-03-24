@@ -2,3 +2,5 @@ __pycache__
 maps/
 venv/
 *.pdf
+*.txt
+.mypy_cache/
