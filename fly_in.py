@@ -98,6 +98,8 @@ class ControlCenter:
                             cn_to_next = self.graph.get_connection(
                                 d.position, next_hub)
                             in_next = position.get(next_hub, 0)
+                            position[d.position] = (
+                                position.get(d.position, 0) - 1)
                             position[next_hub] = (position.get(
                                 next_hub, 0) + 1)
                             link_us[cn_to_next] = link_us.get(
