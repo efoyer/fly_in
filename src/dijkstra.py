@@ -1,3 +1,5 @@
+"""Module implementing a load-aware Dijkstra's algorithm for drone routing."""
+
 from src.graph import Graph
 from src.hub import Hub
 import heapq
@@ -5,6 +7,28 @@ import heapq
 
 def dijkstra_graph(g: Graph,
                    load: dict[Hub, int]) -> tuple[float, tuple[Hub, ...]]:
+    """Find the least-cost path from start to end hub using Dijkstra's algo.
+
+    This is a load-aware variant: the cost to visit a hub is increased by
+    the number of drones already assigned to pass through it. This naturally
+    distributes drones across alternative routes and prevents congestion.
+
+    Hubs with zone type 'blocked' (cost=None) are excluded from the search.
+    Hubs with zone type 'priority' receive a tie-breaking bonus to be
+    preferred over normal hubs when costs are equal.
+
+    Args:
+        g: The graph containing all hubs, connections, and start/end nodes.
+        load: A dictionary mapping each hub to the number of drones already
+            routed through it. Used to increase traversal cost for busy hubs.
+
+    Returns:
+        A tuple of (total_cost, path) where total_cost is the accumulated
+        weighted cost of the path, and path is an ordered tuple of Hub
+        objects from start to end (inclusive). Returns (inf, ()) if no
+        path exists.
+    """
+
     adjaency: dict[Hub, list[tuple[int, Hub]]] = {}
     for c in g.connect:
         if c.end.cost is None or c.start.cost is None:

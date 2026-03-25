@@ -10,7 +10,23 @@ from typing import Optional
 
 
 class ControlCenter:
+    """Orchestrate drone routing and turn-by-turn movement simulation.
+
+    The ControlCenter builds the initial drone fleet, assigns each drone
+    a load-balanced path via Dijkstra, then simulates movement turn by turn
+    while respecting hub capacity, connection throughput, and restricted
+    zone transit rules.
+    """
+
     def __init__(self, graph: Graph):
+        """Initialize the ControlCenter with a parsed graph.
+
+        Assigns paths to all drones using load-aware Dijkstra, distributing
+        traffic to avoid congestion.
+
+        Args:
+            graph: The Graph object representing the full routing network.
+        """
         self.graph = graph
         self.turn = 1
         self.drones: list[Drone] = []
@@ -18,6 +34,12 @@ class ControlCenter:
         self.load_drones()
 
     def load_drones(self) -> None:
+        """Instantiate all drones and assign each a load-balanced path.
+
+        Iterates over the required number of drones. For each drone, runs
+        Dijkstra with the current load state to find the least-congested path,
+        then updates the load map before computing the next drone's path.
+        """
         i = 1
         load: dict[Hub, int] = {}
         for _ in range(self.graph.nb_drones):
@@ -30,11 +52,18 @@ class ControlCenter:
             i += 1
 
     def get_drones(self) -> None:
+        """Print the current state of all drones to stdout."""
         for drone in self.drones:
             print(drone.get_info())
             print()
 
     def run(self) -> None:
+        """Run the full simulation until all drones have reached the
+        destination.
+
+        On each turn, calls step() to advance all drones by one move and
+        prints the result. Stops when no drones remain in the fleet.
+        """
         while self.drones:
             moves = self.step()
             if moves:
@@ -43,6 +72,19 @@ class ControlCenter:
         self.turn -= 1
 
     def step(self) -> Optional[str]:
+        """Advance all drones by one simulation step.
+
+        Processes each drone in order of descending path progress (drones
+        closest to the destination move first) to avoid blocking. Respects:
+        - Hub capacity (max_drones per hub)
+        - Connection throughput (max_link_capacity per connection per turn)
+        - Restricted zone transit: drones entering a restricted hub do so
+          over two turns — first reserving the slot, then completing the move.
+
+        Returns:
+            A string summarising all drone movements this turn, or None
+            if a fatal routing error was encountered.
+        """
         try:
             position: dict[Hub, int] = {}
             link_us: dict[Connection, int] = {}
@@ -137,6 +179,19 @@ class ControlCenter:
 
 
 def main() -> None:
+    """Advance all drones by one simulation step.
+
+    Processes each drone in order of descending path progress (drones
+    closest to the destination move first) to avoid blocking. Respects:
+    - Hub capacity (max_drones per hub)
+    - Connection throughput (max_link_capacity per connection per turn)
+    - Restricted zone transit: drones entering a restricted hub do so
+      over two turns — first reserving the slot, then completing the move.
+
+    Returns:
+        A string summarising all drone movements this turn, or None
+        if a fatal routing error was encountered.
+    """
     try:
         if len(sys.argv) == 2:
             path = sys.argv[1]

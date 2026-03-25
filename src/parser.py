@@ -1,3 +1,5 @@
+"""Module responsible for parsing the map configuration file into a Graph."""
+
 from src.hub import Hub
 from src.graph import Graph
 from enum import Enum
@@ -19,16 +21,6 @@ class Zone_Type(Enum):
     BLOCKED = "blocked"
 
 
-class Color(Enum):
-    RED = "red"
-    BLUE = "blue"
-    GREEN = "green"
-    GRAY = "gray"
-    WHITE = "white"
-    BLACK = "black"
-    PINK = "pink"
-
-
 class MetaDict(TypedDict):
     color: str | None
     zone: str
@@ -36,11 +28,35 @@ class MetaDict(TypedDict):
 
 
 class Parser:
+    """Parse a map file and construct a Graph object from it.
+
+    The Parser reads a key-value text file defining hubs, connections,
+    and simulation parameters. It validates all entries and raises
+    descriptive errors on malformed input.
+    """
+
     hubs: list[Hub] = []
     lst_con: list[Connection] = []
 
     @staticmethod
     def load(path: str) -> Graph:
+        """Parse a map file and return a fully constructed Graph.
+
+        Reads the file line by line, dispatching each key-value pair
+        to the appropriate sub-parser. Validates that a start hub,
+        end hub, and drone count are all present, and that the end
+        hub is reachable via at least one connection.
+
+        Args:
+            path: Filesystem path to the map configuration file.
+
+        Returns:
+            A Graph object populated with all hubs and connections
+            defined in the file.
+
+        Raises:
+            SystemExit: On any file, permission, or validation error.
+        """
         try:
             b_start = False
             b_end = False
@@ -125,6 +141,19 @@ class Parser:
 
     @staticmethod
     def parse_nb_drones(line: str, n_line: int) -> int:
+        """Parse and validate the nb_drones value from a line string.
+
+        Args:
+            line: The raw value string after the 'nb_drones:' key.
+            n_line: The line number in the file, used for error messages.
+
+        Returns:
+            A positive integer representing the number of drones.
+
+        Raises:
+            Exception: If the value is not a positive integer.
+        """
+
         try:
             line = line.strip()
             value: int = int(line)
@@ -138,6 +167,24 @@ class Parser:
 
     @staticmethod
     def parse_connection(line: str, n_line: int) -> Connection:
+        """Parse a connection definition and return a Connection object.
+
+        Accepts the format 'hub1-hub2' or 'hub1-hub2 [max_link_capacity=N]'.
+        Validates that both hubs exist, are distinct, and that the connection
+        does not already exist.
+
+        Args:
+            line: The raw value string after the 'connection:' key.
+            n_line: The line number in the file, used for error messages.
+
+        Returns:
+            A Connection object linking the two named hubs.
+
+        Raises:
+            ValueError: If either hub is unknown, hubs are identical,
+                the connection already exists, or capacity is below 1.
+            Exception: On any other parsing failure.
+        """
         try:
             hub1: str
             hub2: str
@@ -178,6 +225,26 @@ class Parser:
 
     @staticmethod
     def parse_hub(line: str, n_line: int) -> Hub:
+        """Parse a hub definition line and return a Hub object.
+
+        Expects the format 'name x y' or 'name x y [meta]'.
+        Validates coordinate types, name uniqueness, and that the name
+        does not contain a hyphen (reserved for connection syntax).
+
+        Args:
+            line: The raw value string after a 'hub:', 'start_hub:',
+                or 'end_hub:' key.
+            n_line: The line number in the file, used for error messages.
+
+        Returns:
+            A Hub object with the parsed name, coordinates, and metadata.
+
+        Raises:
+            ValueError: If the format is invalid, coordinates are not integers,
+                the name already exists, or the name contains '-'.
+            Exception: On any other parsing failure.
+        """
+
         if "[" in line and "]" in line:
             try:
                 val = line.split("[")[0].strip()
@@ -227,6 +294,22 @@ class Parser:
 
     @staticmethod
     def parse_meta(meta: str, n_line: int) -> MetaDict:
+        """Parse a metadata string and return a MetaDict.
+
+        Processes space-separated key=value pairs within square brackets.
+        Valid keys are 'color', 'zone', and 'max_drones'.
+
+        Args:
+            meta: The raw metadata string, e.g. 'color=blue zone=restricted'.
+            n_line: The line number in the file, used for error messages.
+
+        Returns:
+            A MetaDict with validated color, zone, and max_drones values.
+
+        Raises:
+            ValueError: If any key is invalid, the zone type is unknown,
+                or max_drones is not a non-negative integer.
+        """
         res: MetaDict = {
             "color": None,
             "zone": "normal",
