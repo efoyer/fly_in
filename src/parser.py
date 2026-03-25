@@ -89,7 +89,8 @@ class Parser:
                         b_start = True
                     elif key == "end_hub" and not b_end:
                         end = Parser.parse_hub(value, i)
-                        Parser.hubs.append(end)
+                        if end is not None:
+                            Parser.hubs.append(end)
                         b_end = True
                     elif key == "hub":
                         hub = Parser.parse_hub(value, i)
@@ -339,15 +340,15 @@ class Parser:
                 elif key == "max_drones":
                     try:
                         max_drones = int(value)
-                        if max_drones < 0:
-                            raise ValueError(f"Line {n_line}: Max drones"
+                        if max_drones <= 0:
+                            raise ValueError("Max drones"
                                              " can't be a negative value")
                         else:
                             res.update({
                                 "max_drones": max_drones
                             })
                     except ValueError as e:
-                        raise ValueError(f"Line {n_line}: {e}")
+                        raise ValueError(e)
                 else:
                     raise ValueError(f"Line {n_line}: {key} isn't a valid key")
             else:

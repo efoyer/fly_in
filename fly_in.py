@@ -43,7 +43,9 @@ class ControlCenter:
         i = 1
         load: dict[Hub, int] = {}
         for _ in range(self.graph.nb_drones):
-            _, path = dijkstra_graph(self.graph, load)
+            cost, path = dijkstra_graph(self.graph, load)
+            if cost == float('inf'):
+                raise ValueError("0 path found - Disconnected graph ?")
             drone = Drone(f"D{i}", self.graph.start, path)
             self.drones.append(drone)
 
