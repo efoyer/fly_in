@@ -138,7 +138,6 @@ connection: B-Z [max_link_capacity=2]
 ### Python Type Checking
 
 - [mypy documentation](https://mypy.readthedocs.io/en/stable/)
-- [flake8 documentation](https://flake8.pycqa.org/en/latest/)
 - [PEP 484 — Type Hints](https://peps.python.org/pep-0484/)
 
 ### Visualization

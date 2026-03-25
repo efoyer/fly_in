@@ -204,6 +204,8 @@ def main() -> None:
             sys.exit(1)
     except KeyboardInterrupt:
         sys.exit(1)
+    except Exception:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

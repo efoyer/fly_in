@@ -3,7 +3,7 @@ ARG ?=
 MODULES = flake8 mypy matplotlib mplcursors
 
 run:
-	python3 $(FNAME) $(ARG)
+	python3 $(FNAME) $(ARG) || true
 
 install:
 	pip install $(MODULES)
