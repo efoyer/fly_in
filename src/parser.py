@@ -83,12 +83,12 @@ class Parser:
                         raise ValueError(f"Line: {i}: "
                                          "The file must begin with nb_drones")
                     if key == "start_hub" and not b_start:
-                        start = Parser.parse_hub(value, i)
+                        start = Parser.parse_end_start(value, i, nb_drones)
                         if start is not None:
                             Parser.hubs.append(start)
                         b_start = True
                     elif key == "end_hub" and not b_end:
-                        end = Parser.parse_hub(value, i)
+                        end = Parser.parse_end_start(value, i, nb_drones)
                         if end is not None:
                             Parser.hubs.append(end)
                         b_end = True
@@ -112,7 +112,7 @@ class Parser:
                                          "\nValid key : nb_drones, start_hub, "
                                          "end_hub, hub, connection")
                     l += 1
-                Parser.check_var(end, nb_drones)
+                Parser.check_var(start, end, nb_drones)
                 if not Parser.check_to_end(end):
                     raise ValueError("ValueError: There are no connections "
                                      "linked to the output")
@@ -141,6 +141,15 @@ class Parser:
             sys.exit(1)
 
     @staticmethod
+    def parse_end_start(line: str, n_line: int, nb_drones: int) -> Hub:
+        try:
+            h: Hub = Parser.parse_hub(line, n_line)
+            h.max_drones = nb_drones
+            return h
+        except ValueError as e:
+            raise ValueError(e)
+
+    @staticmethod
     def parse_nb_drones(line: str, n_line: int) -> int:
         """Parse and validate the nb_drones value from a line string.
 
@@ -163,8 +172,8 @@ class Parser:
             else:
                 raise ValueError(f"Line {n_line}: "
                                  f"nb_drones cannot be negative: {value}")
-        except Exception as e:
-            raise Exception(f"Exception at line {n_line}: {e}")
+        except Exception:
+            raise Exception(f"{line} isn't a int")
 
     @staticmethod
     def parse_connection(line: str, n_line: int) -> Connection:
@@ -250,40 +259,42 @@ class Parser:
             try:
                 val = line.split("[")[0].strip()
             except ValueError:
-                raise ValueError(f"Line {n_line}: Error in split for value")
+                raise ValueError(f"{n_line}: Error in split for value")
 
             try:
                 meta = line.split("[")[1].split("]")[0]
             except ValueError:
-                raise ValueError(f"Line {n_line}: Error in split for meta")
+                raise ValueError(f"{n_line}: Error in split for meta")
 
             try:
                 name, x_str, y_str = val.split(" ")
             except ValueError:
-                raise ValueError(f"Line {n_line}: The line should be: "
+                raise ValueError(f"{n_line}: The line should be: "
                                  "name, x, y [optional meta]")
         else:
             try:
                 name, x_str, y_str = line.split(" ")
             except ValueError:
-                raise ValueError(f"Line {n_line}: The line should be: "
+                raise ValueError(f"{n_line}: The line should be: "
                                  "name, x, y [optional meta]")
             meta = None
         try:
             x = int(x_str)
         except ValueError:
-            raise ValueError(f"Line {n_line}: '{x}' isn't a integer")
+            raise ValueError(f"'{x}' isn't a integer")
         try:
             y = int(y_str)
         except ValueError:
-            raise ValueError(f"Line {n_line}: '{y}' isn't a integer")
+            raise ValueError(f"'{y}' isn't a integer")
         try:
             if x is None or y is None:
-                raise ValueError(f'Line {n_line}: x, y must not be None')
+                raise ValueError('x, y must not be None')
             if name in (h.get_name() for h in Parser.hubs):
-                raise ValueError(f"Line {n_line}: {name} already exists")
+                raise ValueError(f"{name} already exists")
             if "-" in name:
-                raise ValueError(f"Line {n_line}: '-' not allowed in the name")
+                raise ValueError("'-' not allowed in the name")
+            if Parser.check_cor(x_cor=x, y_cor=y):
+                raise ValueError("The x and y coordinates are already used")
             if meta:
                 dict_meta: MetaDict = Parser.parse_meta(meta, n_line)
                 return Hub(name, x, y, dict_meta)
@@ -335,8 +346,7 @@ class Parser:
                             "zone": zone
                         })
                     else:
-                        raise ValueError(f"Line {n_line}: "
-                                         f"{value} isn't a zone type")
+                        raise ValueError(f"{value} isn't a zone type")
                 elif key == "max_drones":
                     try:
                         max_drones = int(value)
@@ -350,9 +360,9 @@ class Parser:
                     except ValueError as e:
                         raise ValueError(e)
                 else:
-                    raise ValueError(f"Line {n_line}: {key} isn't a valid key")
+                    raise ValueError(f"{key} isn't a valid key")
             else:
-                raise ValueError(f"Line {n_line}: {key} isn't a valid key")
+                raise ValueError(f"{key} isn't a valid key")
         return res
 
     @staticmethod
@@ -372,11 +382,14 @@ class Parser:
         raise ValueError("No Hub found ! (name_to_hub function)")
 
     @staticmethod
-    def check_var(end: Hub | None, nb_drones: int | None) -> None:
+    def check_var(start: Hub | None, end: Hub | None,
+                  nb_drones: int | None) -> None:
+        if start is None:
+            raise ValueError("File error: start_hub does not exist")
         if end is None:
-            raise ValueError("end_hub does not exist")
+            raise ValueError("File error: end_hub does not exist")
         if nb_drones is None:
-            raise ValueError("nb_drones does not exist")
+            raise ValueError("File error: nb_drones does not exist")
 
     @staticmethod
     def check_to_end(end: Hub | None) -> bool:
@@ -389,5 +402,12 @@ class Parser:
     def check_begin_con(start: Hub) -> bool:
         for con in Parser.lst_con:
             if con.start == start:
+                return True
+        return False
+
+    @staticmethod
+    def check_cor(x_cor: int, y_cor: int):
+        for h in Parser.hubs:
+            if h.x == x_cor and h.y == y_cor:
                 return True
         return False
